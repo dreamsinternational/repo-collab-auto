@@ -1,10 +1,12 @@
-import { useCallback, useState } from "react";
-import "./App.css";
+import { useState } from "react";
+import { Octokit } from "@octokit/rest";
 import NoPAT from "./NoPAT";
 import Names from "./Names";
+import "./App.css";
 
 function App() {
   const [pat, setPat] = useState("");
+  const [token, setToken] = useState("");
   const [repoNames, setRepoNames] = useState([""]);
   const [collaboratorNames, setCollaboratorNames] = useState([]);
 
@@ -12,7 +14,7 @@ function App() {
 
   const onStartTask = (e) => {
     e.preventDefault();
-    if (!pat || !repoNames.length) return;
+    if (!token || !repoNames.length) return;
     try {
     } catch (error) {
       console.log(error);
@@ -23,27 +25,15 @@ function App() {
     <>
       <header className="header">
         <label htmlFor="pat">PAT Token:</label>
-        <input
-          id="pat"
-          type="text"
-          value={pat}
-          onChange={(e) => setPat(e.target.value)}
-        />
+        <input id="pat" type="text" value={pat} onChange={(e) => setPat(e.target.value)} />
+        <button>Init</button>
       </header>
-      {!pat ? (
+      {!token ? (
         <NoPAT />
       ) : (
-        <form
-          className="form"
-          onSubmit={onStartTask}>
-          <Names
-            names={repoNames}
-            setNames={setRepoNames}
-          />
-          <Names
-            names={collaboratorNames}
-            setNames={setCollaboratorNames}
-          />
+        <form className="form" onSubmit={onStartTask}>
+          <Names names={repoNames} setNames={setRepoNames} />
+          <Names names={collaboratorNames} setNames={setCollaboratorNames} />
           <aside>
             <button type="submit">Create</button>
           </aside>
