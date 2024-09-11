@@ -10,10 +10,20 @@ export default function Names({ names = [], setNames = () => {} }) {
             className="name-inp"
             required
             value={name}
-            onChange={(e) => setNames((allnames) => allnames.toSpliced(index, 1, e.target.value))}
+            onChange={(e) => setNames((n) => n.toSpliced(index, 1, e.target.value))}
           />
+          <button
+            type="button"
+            onClick={() => setNames((n) => n.toSpliced(index, 1))}>
+            Del
+          </button>
         </div>
       ))}
+      <button
+        type="button"
+        onClick={() => setNames((n) => n.concat(""))}>
+        Add More
+      </button>
     </fieldset>
   );
 }
