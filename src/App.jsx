@@ -25,8 +25,6 @@ function App() {
             private: true,
           });
 
-          // console.log(repo);
-          console.log(`Repository created: ${repo.html_url}`);
           repo.collaborators = [];
 
           for (const collaboratorName of collaboratorNames) {
@@ -36,8 +34,7 @@ function App() {
               username: collaboratorName,
               permission: "push", // ['admin', 'push', 'pull']
             });
-            // console.log(req);
-            console.log(`Added collaborator ${collaboratorName} to ${repoName}`);
+
             repo.collaborators.push(req);
           }
 
@@ -74,10 +71,12 @@ function App() {
             className="form"
             onSubmit={onStartTask}>
             <Names
+              title="repository"
               names={repoNames}
               setNames={setRepoNames}
             />
             <Names
+              title="collaborator"
               names={collaboratorNames}
               setNames={setCollaboratorNames}
             />
