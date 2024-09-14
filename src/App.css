@@ -12,6 +12,13 @@
   color: #888;
 }
 
+.nav {
+  padding: 0 2rem 2rem 2rem;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
 .header {
   padding: 0 2rem 2rem 2rem;
   display: flex;

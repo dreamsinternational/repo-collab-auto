@@ -1,101 +1,37 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Octokit } from "@octokit/rest";
 import NoPAT from "./NoPAT";
-import Names from "./Names";
 import "./App.css";
+import App1 from "./App1";
+import App2 from "./App2";
 
 function App() {
   const [pat, setPat] = useState("");
   const [octokit, setOctokit] = useState(null);
-  const [repoNames, setRepoNames] = useState([""]);
-  const [collaboratorNames, setCollaboratorNames] = useState([]);
+  const [page, setPage] = useState("1");
   const [isLoading, setIsLoading] = useState(false);
-  const [repositories, setRepositories] = useState([]);
-
-  const onStartTask = useCallback(
-    async (e) => {
-      e.preventDefault();
-      if (!octokit || !repoNames.length) return;
-      setIsLoading(true);
-      try {
-        for (const repoName of repoNames) {
-          const { data: repo } = await octokit.repos.createForAuthenticatedUser({
-            name: repoName,
-            // auto_init: false,
-            private: true,
-          });
-
-          repo.collaborators = [];
-
-          for (const collaboratorName of collaboratorNames) {
-            const { data: req } = await octokit.repos.addCollaborator({
-              owner: repo.owner.login,
-              repo: repo.name,
-              username: collaboratorName,
-              permission: "push", // ['admin', 'push', 'pull']
-            });
-
-            repo.collaborators.push(req);
-          }
-
-          setRepositories((r) => r.concat(repo));
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
-        setRepoNames([""]);
-        setCollaboratorNames([]);
-      }
-    },
-    [octokit, repoNames, collaboratorNames]
-  );
 
   return (
     <>
+      <nav className="nav">
+        <a href="#1" onClick={() => setPage("1")}>
+          App 1
+        </a>
+        <a href="#2" onClick={() => setPage("2")}>
+          App 2
+        </a>
+      </nav>
       <header className="header">
         <label htmlFor="pat">PAT Token:</label>
-        <input
-          id="pat"
-          type="text"
-          value={pat}
-          onChange={(e) => setPat(e.target.value)}
-        />
+        <input id="pat" type="text" value={pat} onChange={(e) => setPat(e.target.value)} />
         <button onClick={() => setOctokit(new Octokit({ auth: pat })) ?? setPat("")}>Init</button>
       </header>
       {!octokit || isLoading ? (
         <NoPAT />
       ) : (
         <>
-          <form
-            className="form"
-            onSubmit={onStartTask}>
-            <Names
-              title="repository"
-              names={repoNames}
-              setNames={setRepoNames}
-            />
-            <Names
-              title="collaborator"
-              names={collaboratorNames}
-              setNames={setCollaboratorNames}
-            />
-            <aside>
-              <button type="submit">Start</button>
-            </aside>
-          </form>
-          <aside>
-            <h3>
-              <u>Repositories</u>
-            </h3>
-            {repositories.map((r) => (
-              <details key={r.id}>
-                <summary>{r.full_name}</summary>
-                <hr />
-                <pre>{JSON.stringify(r, 0, 1)}</pre>
-              </details>
-            ))}
-          </aside>
+          {page === "1" && <App1 octokit={octokit} setIsLoading={setIsLoading} />}
+          {page === "2" && <App2 octokit={octokit} setIsLoading={setIsLoading} />}
         </>
       )}
     </>
