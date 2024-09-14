@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import Names from "./Names";
 import "./App.css";
 
-function App2({ octokit = null, setIsLoading = () => {} }) {
+function App2({ octokit = null }) {
   const [collaboratorNames, setCollaboratorNames] = useState([""]);
   const [messages, setMessages] = useState([]);
 
@@ -43,7 +43,7 @@ function App2({ octokit = null, setIsLoading = () => {} }) {
                 repo: repo.name,
                 username: cname,
               });
-              setMessages((ms) => ms.concat(`Removed ${cname} from ${repo.name}`));
+              setMessages((ms) => [`Removed ${cname} from ${repo.name}`, ...ms]);
             }
           }
         }
