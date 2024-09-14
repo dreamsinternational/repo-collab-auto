@@ -10,11 +10,25 @@ function App2({ octokit = null, setIsLoading = () => {} }) {
     async (e) => {
       e.preventDefault();
       if (!octokit || !collaboratorNames.length) return;
-      setIsLoading(true);
       try {
-        const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser();
+        const { data: user } = await octokit.rest.users.getAuthenticated();
+        const ownerusername = user.login; // Get the GitHub username
 
-        for (const repo of repos) {
+        const repositories = [];
+        let page = 1,
+          len = 0;
+        do {
+          const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({ per_page: 100, page });
+
+          page++;
+          len = repos.length;
+          console.log(len);
+          console.log(repos);
+
+          repositories.push(...repos.filter((re) => re.owner.login === ownerusername));
+        } while (len > 0);
+
+        for (const repo of repositories) {
           const { data: collaborators } = await octokit.rest.repos.listCollaborators({
             owner: repo.owner.login,
             repo: repo.name,
@@ -36,11 +50,10 @@ function App2({ octokit = null, setIsLoading = () => {} }) {
       } catch (error) {
         console.log(error);
       } finally {
-        setIsLoading(false);
         setCollaboratorNames([""]);
       }
     },
-    [octokit, collaboratorNames, setIsLoading]
+    [octokit, collaboratorNames]
   );
 
   return (
