@@ -8,6 +8,10 @@
   align-items: stretch;
 }
 
+pre {
+  text-align: initial;
+}
+
 .read-the-docs {
   color: #888;
 }
