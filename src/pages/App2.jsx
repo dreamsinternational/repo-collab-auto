@@ -52,13 +52,13 @@ function App2() {
           }
         }
 
+        setCollaboratorNames([""]);
         showAlert({ type: "success", title: "Success !", text: "Collaborators Removed from All Repositories" });
       } catch (error) {
         console.log(error);
         showAlert({ type: "error", title: "Error !", text: error.message });
       } finally {
         setLoading(false);
-        setCollaboratorNames([""]);
       }
     },
     [octokit, collaboratorNames, setLoading, showAlert]

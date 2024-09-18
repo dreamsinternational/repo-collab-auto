@@ -41,14 +41,15 @@ function App1() {
 
           setRepositories((r) => r.concat(repo));
         }
+
+        setRepoNames([""]);
+        setCollaboratorNames([]);
         showAlert({ type: "success", title: "Success !", text: "Collaborators added to Repositories" });
       } catch (error) {
         console.log(error);
         showAlert({ type: "error", title: "Error !", text: error.message });
       } finally {
         setLoading(false);
-        setRepoNames([""]);
-        setCollaboratorNames([]);
       }
     },
     [octokit, repoNames, setLoading, showAlert, collaboratorNames]
