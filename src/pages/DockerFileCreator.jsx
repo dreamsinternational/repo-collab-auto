@@ -15,7 +15,7 @@ CMD ["npm", "start"]
 EXPOSE 8000
 `;
 
-function App3() {
+function DockerFileCreator() {
   const { showAlert } = useContext(GlobalContext);
 
   const [dockerfile, setDockerfile] = useState("");
@@ -85,4 +85,4 @@ function App3() {
   );
 }
 
-export default App3;
+export default DockerFileCreator;

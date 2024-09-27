@@ -4,9 +4,9 @@ export default function Layout() {
   return (
     <>
       <nav className="nav">
-        <NavLink to="/app1">App 1</NavLink>
-        <NavLink to="/app2">App 2</NavLink>
-        <NavLink to="/app3">App 3</NavLink>
+        <NavLink to="/bulkrepocreator">App 1</NavLink>
+        <NavLink to="/userremoveallrepos">App 2</NavLink>
+        <NavLink to="/dockerfilecreator">App 3</NavLink>
       </nav>
       <Outlet />
     </>

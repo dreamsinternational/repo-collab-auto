@@ -4,7 +4,7 @@ import { Octokit } from "@octokit/rest";
 import Names from "../components/Names";
 import NoPAT from "../components/NoPAT";
 
-function App1() {
+function BulkRepoCreator() {
   const { showAlert, setLoading } = useContext(GlobalContext);
 
   const [pat, setPat] = useState("");
@@ -20,28 +20,37 @@ function App1() {
       setLoading(true);
       try {
         for (const repoName of repoNames) {
-          const { data: repo } = await octokit.repos.createForAuthenticatedUser({
-            name: repoName,
-            // auto_init: false,
-            private: true,
-          });
-
-          repo.collaborators = [];
-
-          for (const collaboratorName of collaboratorNames) {
-            const { data: req } = await octokit.repos.addCollaborator({
-              owner: repo.owner.login,
-              repo: repo.name,
-              username: collaboratorName,
-              permission: "push", // ['admin', 'push', 'pull']
+          try {
+            const { data: repo } = await octokit.repos.createForAuthenticatedUser({
+              name: repoName,
+              // auto_init: false,
+              private: true,
             });
 
-            repo.collaborators.push(req);
+            repo.collaborators = [];
+
+            for (const collaboratorName of collaboratorNames) {
+              try {
+                const { data: req } = await octokit.repos.addCollaborator({
+                  owner: repo.owner.login,
+                  repo: repo.name,
+                  username: collaboratorName,
+                  permission: "push", // ['admin', 'push', 'pull']
+                });
+
+                repo.collaborators.push(req);
+              } catch (error) {
+                console.log(error);
+                showAlert({ type: "error", title: "Error !", text: error.message });
+              }
+            }
+
+            setRepositories((r) => r.concat(repo));
+          } catch (error) {
+            console.log(error);
+            showAlert({ type: "error", title: "Error !", text: error.message });
           }
-
-          setRepositories((r) => r.concat(repo));
         }
-
         setRepoNames([""]);
         setCollaboratorNames([]);
         showAlert({ type: "success", title: "Success !", text: "Collaborators added to Repositories" });
@@ -91,4 +100,4 @@ function App1() {
   );
 }
 
-export default App1;
+export default BulkRepoCreator;
