@@ -4,59 +4,52 @@ import { Octokit } from "@octokit/rest";
 import Csvs from "../components/Csvs";
 import NoPAT from "../components/NoPAT";
 
-function BulkRepoCreator() {
+function BulkCollaboratorAdd() {
   const { showAlert, setLoading } = useContext(GlobalContext);
 
   const [pat, setPat] = useState("");
   const [octokit, setOctokit] = useState(null);
   const [repoText, setRepoText] = useState("");
   const [collabText, setCollabText] = useState("");
-  const [repositories, setRepositories] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   const onStartTask = useCallback(
     async (e) => {
       e.preventDefault();
-      if (!octokit || !repoText.length) return;
+      if (!octokit || !repoText.length || !collabText.length) return;
       setLoading(true);
+      setMessages([]);
       try {
         const repoNames = repoText.split(",").map((t) => t.trim());
         const collaboratorNames = collabText.split(",").map((t) => t.trim());
 
+        const { data: user } = await octokit.rest.users.getAuthenticated();
+        const ownerusername = user.login;
+
         for (const repoName of repoNames) {
-          try {
-            const { data: repo } = await octokit.repos.createForAuthenticatedUser({
-              name: repoName,
-              // auto_init: false,
-              private: true,
-            });
+          for (const collaboratorName of collaboratorNames) {
+            try {
+              await octokit.repos.addCollaborator({
+                owner: ownerusername,
+                repo: repoName,
+                username: collaboratorName,
+                permission: "push", // ['admin', 'push', 'pull']
+              });
 
-            repo.collaborators = [];
-
-            for (const collaboratorName of collaboratorNames) {
-              try {
-                const { data: req } = await octokit.repos.addCollaborator({
-                  owner: repo.owner.login,
-                  repo: repo.name,
-                  username: collaboratorName,
-                  permission: "push", // ['admin', 'push', 'pull']
-                });
-
-                repo.collaborators.push(req);
-              } catch (error) {
-                console.log(error);
-                showAlert({ type: "error", title: "Error !", text: error.message });
-              }
+              setMessages((ms) => ms.concat(`Added ${collaboratorName} as Collaborator in ${repoName}`));
+            } catch (error) {
+              console.log(error);
+              showAlert({ type: "error", title: "Error !", text: error.message });
+              setMessages((ms) => ms.concat(`Failed to add ${collaboratorName} as Collaborator in ${repoName}`));
             }
-
-            setRepositories((r) => r.concat(repo));
-          } catch (error) {
-            console.log(error);
-            showAlert({ type: "error", title: "Error !", text: error.message });
           }
         }
+
         setRepoText("");
         setCollabText("");
-        showAlert({ type: "success", title: "Success !", text: "Collaborators added to Repositories" });
+        setMessages((ms) => ms.concat("All Possible Collaborators added"));
+
+        showAlert({ type: "success", title: "Success !", text: "All Possible Collaborators added to Repositories" });
       } catch (error) {
         console.log(error);
         showAlert({ type: "error", title: "Error !", text: error.message });
@@ -87,14 +80,10 @@ function BulkRepoCreator() {
           </form>
           <aside>
             <h3>
-              <u>Repositories</u>
+              <u>Logs</u>
             </h3>
-            {repositories.map((r) => (
-              <details key={r.id}>
-                <summary>{r.full_name}</summary>
-                <hr />
-                <pre>{JSON.stringify(r, 0, 1)}</pre>
-              </details>
+            {messages.map((m) => (
+              <p key={m}>{m}</p>
             ))}
           </aside>
         </>
@@ -103,4 +92,4 @@ function BulkRepoCreator() {
   );
 }
 
-export default BulkRepoCreator;
+export default BulkCollaboratorAdd;
