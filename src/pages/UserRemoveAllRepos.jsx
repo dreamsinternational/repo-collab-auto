@@ -11,6 +11,7 @@ function UserRemoveAllRepos() {
   const [octokit, setOctokit] = useState(null);
   const [collaboratorNames, setCollaboratorNames] = useState([""]);
   const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
 
   const onStartTask = useCallback(
     async (e) => {
@@ -43,7 +44,7 @@ function UserRemoveAllRepos() {
               owner: repo.owner.login,
               repo: repo.name,
             });
-
+            setMessage(`Checking ${repo.name}`);
             for (const cname of collaboratorNames) {
               const collaborator = collaborators.find((c) => c.login === cname);
 
@@ -66,7 +67,7 @@ function UserRemoveAllRepos() {
             showAlert({ type: "error", title: "Error !", text: error.message });
           }
         }
-
+        setMessage(`All Repos Checked !`);
         setCollaboratorNames([""]);
         showAlert({ type: "success", title: "Success !", text: "Collaborators Removed from All Repositories" });
       } catch (error) {
@@ -103,6 +104,7 @@ function UserRemoveAllRepos() {
             {messages.map((r) => (
               <p key={r}>{r}</p>
             ))}
+            <p>{message}</p>
           </aside>
         </>
       )}
